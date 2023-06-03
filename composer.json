@@ -1,6 +1,13 @@
 {
     "name": "drupal/tengstrom_demo",
     "type": "drupal-module--tengstrom",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:ordermind/drupal--tengstrom-general.git",
+            "no-api": true
+        }
+    ],
     "require": {
         "drupal/core": "^9.4",
         "drupal/tengstrom_general": "dev-master",
