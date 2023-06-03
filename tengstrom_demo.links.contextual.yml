@@ -1,0 +1,10 @@
+entity.tengstrom_demo_content.edit_form:
+  route_name: entity.tengstrom_demo_content.edit_form
+  group: tengstrom_demo_content
+  title: Edit
+
+entity.tengstrom_demo_content.delete_form:
+  route_name: entity.tengstrom_demo_content.delete_form
+  group: tengstrom_demo_content
+  title: Delete
+  weight: 10

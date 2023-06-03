@@ -1,0 +1,12 @@
+{
+    "name": "drupal/tengstrom_demo",
+    "type": "drupal-module--tengstrom",
+    "require": {
+        "drupal/core": "^9.4",
+        "drupal/tengstrom_general": "dev-master",
+        "drupal/accordion_table": "dev-master",
+        "drupal/actionlink_dropdown": "dev-master",
+        "drupal/menu_migration": "^1.0@alpha"
+    }
+}
+

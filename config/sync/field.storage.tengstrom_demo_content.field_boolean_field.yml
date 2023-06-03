@@ -1,0 +1,18 @@
+uuid: f418a776-d8dd-453a-96dd-19425a171aff
+langcode: en
+status: true
+dependencies:
+  module:
+    - tengstrom_demo
+id: tengstrom_demo_content.field_boolean_field
+field_name: field_boolean_field
+entity_type: tengstrom_demo_content
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

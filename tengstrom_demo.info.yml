@@ -1,0 +1,13 @@
+name: Tengström Demo
+type: module
+package: Tengström Profile
+description: 'Provides demo content for the Tengström profile'
+core_version_requirement: '^9'
+
+dependencies:
+  - accordion_table:accordion_table
+  - actionlink_dropdown:actionlink_dropdown
+  - drupal:views
+  - menu_migration:menu_migration
+
+version: 0.1.0

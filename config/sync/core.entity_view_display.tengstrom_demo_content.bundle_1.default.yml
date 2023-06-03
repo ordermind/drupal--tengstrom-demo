@@ -1,0 +1,61 @@
+uuid: f25eba51-4b52-4875-8266-4c285e2f9c65
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.tengstrom_demo_content.bundle_1.field_boolean_field
+    - tengstrom_demo.tengstrom_demo_content_type.bundle_1
+  module:
+    - user
+id: tengstrom_demo_content.bundle_1.default
+targetEntityType: tengstrom_demo_content
+bundle: bundle_1
+mode: default
+content:
+  created:
+    type: timestamp
+    label: above
+    settings:
+      date_format: medium
+      custom_date_format: ''
+      timezone: ''
+    third_party_settings: {  }
+    weight: 20
+    region: content
+  field_boolean_field:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 21
+    region: content
+  label:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: -5
+    region: content
+  status:
+    type: boolean
+    label: above
+    settings:
+      format: enabled-disabled
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  uid:
+    type: author
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 15
+    region: content
+hidden:
+  langcode: true

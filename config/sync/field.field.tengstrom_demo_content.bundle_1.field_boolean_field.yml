@@ -1,0 +1,21 @@
+uuid: 96865c12-66ba-4e42-8143-c05ee35a6aa1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.tengstrom_demo_content.field_boolean_field
+    - tengstrom_demo.tengstrom_demo_content_type.bundle_1
+id: tengstrom_demo_content.bundle_1.field_boolean_field
+field_name: field_boolean_field
+entity_type: tengstrom_demo_content
+bundle: bundle_1
+label: 'Boolean field'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ */
+function tengstrom_demo_install() {
+  _tengstrom_demo_import_menu_items();
+}
+
+function _tengstrom_demo_import_menu_items() {
+  // Save the original config path to a variable.
+  $config = \Drupal::configFactory()->getEditable('menu_migration.settings');
+  $originalExportPath = $config->get('export_path');
+
+  // Temporarily set migration config path to a path within this module.
+  $newExportPath = drupal_get_path('module', 'tengstrom_demo') . '/config/menu_migration';
+  $config->set('export_path', $newExportPath);
+  $config->save();
+
+  // Import the menu.
+  /** @var \Drupal\menu_migration\Service\MenuMigrationService $menuMigration */
+  $menuMigration = \Drupal::service('menu_migration.import_export');
+  $menuMigration->importMenu('main');
+
+  // Restore the migration config path to its old value.
+  $config->set('export_path', $originalExportPath);
+  $config->save();
+}

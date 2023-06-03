@@ -1,0 +1,14 @@
+administer demo content types:
+  title: 'Administer demo content types'
+  description: 'Maintain the types of demo content entity.'
+  restrict access: true
+access demo content overview:
+  title: Access demo content overview
+delete demo content:
+  title: Delete demo content
+create demo content:
+  title: Create demo content
+view demo content:
+  title: View demo content
+edit demo content:
+  title: Edit demo content

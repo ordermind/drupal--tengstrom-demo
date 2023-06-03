@@ -1,0 +1,25 @@
+uuid: bfd4d4ce-faaf-4082-baeb-f9a48702dae4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.tengstrom_demo_content.field_wysiwyg_field
+    - tengstrom_demo.tengstrom_demo_content_type.bundle_2
+  module:
+    - allowed_formats
+    - text
+third_party_settings:
+  allowed_formats:
+    allowed_formats: {  }
+id: tengstrom_demo_content.bundle_2.field_wysiwyg_field
+field_name: field_wysiwyg_field
+entity_type: tengstrom_demo_content
+bundle: bundle_2
+label: 'Wysiwyg field'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

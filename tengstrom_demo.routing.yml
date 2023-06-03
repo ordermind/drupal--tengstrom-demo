@@ -1,0 +1,7 @@
+tengstrom_demo.demo_content:
+  path: '/demo-content'
+  defaults:
+    _title: 'Demo Content'
+    _controller: '\Drupal\tengstrom_demo\Controller\TengstromDemoController::index'
+  requirements:
+    _permission: 'access demo content overview'

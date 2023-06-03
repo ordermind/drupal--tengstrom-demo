@@ -1,0 +1,5 @@
+entity.tengstrom_demo_content_type.collection:
+  title: 'Demo Content types'
+  description: 'Manage and CRUD actions on Demo Content type.'
+  parent: system.admin_structure
+  route_name: entity.tengstrom_demo_content_type.collection

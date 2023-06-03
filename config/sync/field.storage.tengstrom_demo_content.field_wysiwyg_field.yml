@@ -1,0 +1,19 @@
+uuid: b5d0ec02-a0c0-4524-9d3e-148805eaa8c3
+langcode: en
+status: true
+dependencies:
+  module:
+    - tengstrom_demo
+    - text
+id: tengstrom_demo_content.field_wysiwyg_field
+field_name: field_wysiwyg_field
+entity_type: tengstrom_demo_content
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

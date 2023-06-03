@@ -1,0 +1,6 @@
+uuid: c8abbdbc-9ba8-4b94-9234-9f303ecf3238
+langcode: en
+status: true
+dependencies: {  }
+id: bundle_2
+label: 'Bundle 2'

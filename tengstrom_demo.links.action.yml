@@ -1,0 +1,66 @@
+tengstrom_demo_content.type_add:
+  title: 'Add demo content type'
+  route_name: entity.tengstrom_demo_content_type.add_form
+  appears_on:
+    - entity.tengstrom_demo_content_type.collection
+
+tengstrom_demo_content.add_page:
+  title: 'Add demo content'
+  route_name: entity.tengstrom_demo_content.add_page
+  appears_on:
+    - entity.tengstrom_demo_content.collection
+
+tengstrom_demo_content.single_custom_link:
+  route_name: tengstrom_demo.demo_content
+  # Using the MenuLinkAdd class adds a destination query string that redirects to the current page.
+  class: \Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd
+  title: 'Add demo content'
+  appears_on:
+    - tengstrom_demo.demo_content
+  options:
+    widget: details
+    links: custom
+    custom_links:
+      -
+        title: 'Bundle 1'
+        route_name: 'entity.tengstrom_demo_content.add_form'
+        route_parameters:
+          tengstrom_demo_content_type: 'bundle_1'
+    fallback_title_prefix: 'Add'
+  weight: 2
+
+tengstrom_demo_content.multiple_custom_links:
+  route_name: tengstrom_demo.demo_content
+  # Using the MenuLinkAdd class adds a destination query string that redirects to the current page.
+  class: \Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd
+  title: 'Add demo content'
+  appears_on:
+    - tengstrom_demo.demo_content
+  options:
+    widget: details
+    links: custom
+    custom_links:
+      -
+        title: 'Bundle 1'
+        route_name: 'entity.tengstrom_demo_content.add_form'
+        route_parameters:
+          tengstrom_demo_content_type: 'bundle_1'
+      -
+        title: 'Bundle 2'
+        route_name: 'entity.tengstrom_demo_content.add_form'
+        route_parameters:
+          tengstrom_demo_content_type: 'bundle_2'
+    fallback_title_prefix: 'Add'
+  weight: 1
+
+tengstrom_demo_content.multiple_entity_add_links:
+  route_name: tengstrom_demo.demo_content
+  # Using the MenuLinkAdd class adds a destination query string that redirects to the current page.
+  class: \Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd
+  title: 'Add demo content'
+  appears_on:
+    - tengstrom_demo.demo_content
+  options:
+    widget: details_select
+    links: entity_add
+    entity_type: tengstrom_demo_content

@@ -1,0 +1,95 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * @file
+ * Provides a demo content entity type.
+ */
+
+use Drupal\Core\Render\Element;
+use Drupal\user\UserInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function tengstrom_demo_theme() {
+  return [
+    'tengstrom_demo_content' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for demo content templates.
+ *
+ * Default template: tengstrom-demo-content.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the demo content
+ *     information and any fields attached to the entity.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_tengstrom_demo_content(array &$variables) {
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function tengstrom_demo_user_cancel($edit, UserInterface $account, $method) {
+  switch ($method) {
+    case 'user_cancel_block_unpublish':
+      // Unpublish demo content.
+      $storage = \Drupal::entityTypeManager()->getStorage('tengstrom_demo_content');
+      $tengstrom_demo_content_ids = $storage->getQuery()
+        ->condition('uid', $account->id())
+        ->condition('status', 1)
+        ->execute();
+      foreach ($storage->loadMultiple($tengstrom_demo_content_ids) as $tengstrom_demo_content) {
+        /** @var \Drupal\tengstrom_demo\Entity\TengstromDemoContent $tengstrom_demo_content */
+        $tengstrom_demo_content->set('status', FALSE);
+        $tengstrom_demo_content->save();
+      }
+      break;
+
+    case 'user_cancel_reassign':
+      // Anonymize demo content.
+      $storage = \Drupal::entityTypeManager()->getStorage('tengstrom_demo_content');
+      $tengstrom_demo_content_ids = $storage->getQuery()
+        ->condition('uid', $account->id())
+        ->execute();
+      foreach ($storage->loadMultiple($tengstrom_demo_content_ids) as $tengstrom_demo_content) {
+        /** @var \Drupal\tengstrom_demo\Entity\TengstromDemoContent $tengstrom_demo_content */
+        $tengstrom_demo_content->setOwnerId(0);
+        $tengstrom_demo_content->save();
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for user entities.
+ */
+function tengstrom_demo_user_predelete(UserInterface $account) {
+  // Delete demo content.
+  $storage = \Drupal::entityTypeManager()->getStorage('tengstrom_demo_content');
+  $tengstrom_demo_content_ids = $storage->getQuery()
+    ->condition('uid', $account->id())
+    ->execute();
+  $tengstrom_demo_content = $storage->loadMultiple($tengstrom_demo_content_ids);
+  $storage->delete($tengstrom_demo_content);
+  // Delete old revisions.
+  $tengstrom_demo_content_ids = $storage->getQuery()
+    ->allRevisions()
+    ->condition('uid', $account->id())
+    ->execute();
+  foreach (array_keys($tengstrom_demo_content_ids) as $revision_id) {
+    $storage->deleteRevision($revision_id);
+  }
+}
