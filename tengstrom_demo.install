@@ -15,7 +15,7 @@ function _tengstrom_demo_import_menu_items() {
   $originalExportPath = $config->get('export_path');
 
   // Temporarily set migration config path to a path within this module.
-  $newExportPath = drupal_get_path('module', 'tengstrom_demo') . '/config/menu_migration';
+  $newExportPath = \Drupal::service('extension.list.module')->getPath('tengstrom_demo') . '/config/menu_migration';
   $config->set('export_path', $newExportPath);
   $config->save();
 
