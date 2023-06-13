@@ -8,6 +8,14 @@ declare(strict_types=1);
 function tengstrom_demo_install() {
   _tengstrom_demo_import_config();
   _tengstrom_demo_import_menu_items();
+  _tengstrom_demo_enable_split_config();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function tengstrom_demo_uninstall() {
+  _tengstrom_demo_disable_split_config();
 }
 
 function _tengstrom_demo_import_config() {
@@ -42,4 +50,26 @@ function _tengstrom_demo_import_menu_items() {
     $config->set('export_path', $originalExportPath);
     $config->save();
   }
+}
+
+/**
+ * Enable the split config to prevent that the imported config
+ * is accidentally exported to main config folder.
+ */
+function _tengstrom_demo_enable_split_config() {
+  /** @var \Drupal\config_split\Entity\ConfigSplitEntityInterface $entity */
+  $entity = \Drupal::entityTypeManager()->getStorage('config_split')->load('demo_module_config');
+  $entity->set('status', TRUE);
+  $entity->save();
+}
+
+/**
+ * Disable the split config to prevent that the config files
+ * are deleted during a config export.
+ */
+function _tengstrom_demo_disable_split_config() {
+  /** @var \Drupal\config_split\Entity\ConfigSplitEntityInterface $entity */
+  $entity = \Drupal::entityTypeManager()->getStorage('config_split')->load('demo_module_config');
+  $entity->set('status', FALSE);
+  $entity->save();
 }
