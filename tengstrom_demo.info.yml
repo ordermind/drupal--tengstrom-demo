@@ -9,5 +9,6 @@ dependencies:
   - actionlink_dropdown:actionlink_dropdown
   - drupal:views
   - menu_migration:menu_migration
+  - confi:config_import
 
 version: 0.1.0

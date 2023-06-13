@@ -6,7 +6,20 @@ declare(strict_types=1);
  * Implements hook_install().
  */
 function tengstrom_demo_install() {
+  _tengstrom_demo_import_config();
   _tengstrom_demo_import_menu_items();
+}
+
+function _tengstrom_demo_import_config() {
+  /** @var \Drupal\config_import\ConfigImporterServiceInterface $importer */
+  $importer = \Drupal::service('config_import.importer');
+  $directory = \Drupal::service('extension.list.module')->getPath('tengstrom_demo') . '/config/sync';
+  $importer->setDirectory($directory);
+  $configs = array_map(
+    fn(string $path) => pathinfo($path, PATHINFO_FILENAME),
+    glob("{$directory}/*.yml")
+  );
+  $importer->importConfigs($configs);
 }
 
 function _tengstrom_demo_import_menu_items() {
