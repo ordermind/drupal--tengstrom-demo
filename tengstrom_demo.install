@@ -7,7 +7,6 @@ declare(strict_types=1);
  */
 function tengstrom_demo_install() {
   _tengstrom_demo_import_config();
-  _tengstrom_demo_import_menu_items();
   _tengstrom_demo_enable_split_config();
 }
 
@@ -28,28 +27,6 @@ function _tengstrom_demo_import_config() {
     glob("{$directory}/*.yml")
   );
   $importer->importConfigs($configs);
-}
-
-function _tengstrom_demo_import_menu_items() {
-  // Save the original config path to a variable.
-  $config = \Drupal::configFactory()->getEditable('menu_migration.settings');
-  $originalExportPath = $config->get('export_path');
-
-  // Temporarily set migration config path to a path within this module.
-  $newExportPath = \Drupal::service('extension.list.module')->getPath('tengstrom_demo') . '/config/menu_migration';
-  $config->set('export_path', $newExportPath);
-  $config->save();
-
-  try {
-    // Import the menu.
-    /** @var \Drupal\menu_migration\Service\MenuMigrationService $menuMigration */
-    $menuMigration = \Drupal::service('menu_migration.import_export');
-    $menuMigration->importMenu('main');
-  } finally {
-    // Restore the migration config path to its old value.
-    $config->set('export_path', $originalExportPath);
-    $config->save();
-  }
 }
 
 /**
