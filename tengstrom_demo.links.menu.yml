@@ -6,6 +6,6 @@ entity.tengstrom_demo_content_type.collection:
 
 entity.tengstrom_demo_content.list:
   title: 'Demo Content'
-  parent: main
+  menu_name: main
   route_name: tengstrom_demo.demo_content
   weight: 0
