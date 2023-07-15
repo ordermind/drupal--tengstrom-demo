@@ -3,7 +3,6 @@ services:
     class: Drupal\tengstrom_demo\EntityGeneration\EntityGenerator
     arguments:
       - '@entity_type.manager'
-      - '@current_user'
 
   tengstrom_demo_entity_deleter:
     class: Drupal\tengstrom_demo\EntityGeneration\EntityDeleter
@@ -14,6 +13,7 @@ services:
     class: Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithBatchStrategy
     arguments:
       - '@messenger'
+      - '@extension.path.resolver'
       - '@tengstrom_demo_entity_generator'
       - '@tengstrom_demo_entity_deleter'
 

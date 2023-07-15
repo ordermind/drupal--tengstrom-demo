@@ -35,13 +35,13 @@ class EntityGeneratorWithoutBatchStrategy implements EntityGeneratorStrategyInte
   protected function deleteExistingEntities(string $entityTypeId): void {
     $this->entityDeleter->deleteAllEntitiesOfType($entityTypeId);
 
-    $this->messenger->addStatus($this->t('Old entities have been deleted.'));
+    $this->messenger->addMessage($this->t('Old entities have been deleted.'));
   }
 
   protected function createNewEntities(EntityGenerationOptions $options): void {
     $this->entityGenerator->generateEntities($options);
 
-    $this->messenger->addStatus($this->t('@num_entities created.', [
+    $this->messenger->addMessage($this->t('@num_entities created.', [
       '@num_entities' => $this->formatPlural($options->getNumberOfEntities(), '1 entity', '@count entities'),
     ]));
   }

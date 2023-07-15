@@ -11,7 +11,7 @@ class EntityGenerationOptions {
   protected int $numberOfEntities;
   protected bool $deleteEntitiesBeforeCreation;
   protected array $baseData;
-  protected ?int $authorUid;
+  protected int $authorUid;
 
   /**
    * @param string[] $bundleNames The bundle ids that entities should be created for.
@@ -28,16 +28,29 @@ class EntityGenerationOptions {
     array $bundleNames,
     int $numberOfEntities,
     bool $deleteEntitiesBeforeCreation,
-    array $baseData = [],
-    int $authorUid = NULL
+    int $authorUid
   ) {
+    if ($numberOfEntities < 0) {
+      throw new \InvalidArgumentException('The "numberOfEntities" parameter must be a positive integer');
+    }
+
     $this->entityTypeId = $entityTypeId;
     $this->labelPattern = $labelPattern;
     $this->bundleNames = $bundleNames;
     $this->numberOfEntities = $numberOfEntities;
     $this->deleteEntitiesBeforeCreation = $deleteEntitiesBeforeCreation;
-    $this->baseData = $baseData;
     $this->authorUid = $authorUid;
+  }
+
+  public static function fromArray(array $values): static {
+    return new static(
+      $values['entityTypeId'],
+      $values['labelPattern'],
+      $values['bundleNames'],
+      $values['numberOfEntities'],
+      $values['deleteEntitiesBeforeCreation'],
+      $values['authorUid']
+    );
   }
 
   public function getEntityTypeId(): string {
@@ -60,12 +73,19 @@ class EntityGenerationOptions {
     return $this->deleteEntitiesBeforeCreation;
   }
 
-  public function getBaseData(): array {
-    return $this->baseData;
+  public function getAuthorUid(): int {
+    return $this->authorUid;
   }
 
-  public function getAuthorUid(): ?int {
-    return $this->authorUid;
+  public function toArray(): array {
+    return [
+      'entityTypeId' => $this->getEntityTypeId(),
+      'labelPattern' => $this->getLabelPattern(),
+      'bundleNames' => $this->getBundleNames(),
+      'numberOfEntities' => $this->getNumberOfEntities(),
+      'deleteEntitiesBeforeCreation' => $this->isDeleteEntitiesBeforeCreation(),
+      'authorUid' => $this->getAuthorUid(),
+    ];
   }
 
 }

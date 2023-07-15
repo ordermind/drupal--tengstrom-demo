@@ -39,6 +39,7 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
   protected EntityTypeBundleInfoInterface $bundleInfo;
   protected EntityGeneratorWithBatchStrategy $entityGeneratorBatchStrategy;
   protected EntityGeneratorWithoutBatchStrategy $entityGeneratorNoBatchStrategy;
+  protected AccountProxyInterface $currentUser;
 
   public function __construct(
     array $configuration, 
@@ -46,13 +47,15 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
     array $plugin_definition, 
     EntityTypeBundleInfoInterface $bundleInfo,
     EntityGeneratorWithBatchStrategy $entityGeneratorBatchStrategy,
-    EntityGeneratorWithoutBatchStrategy $entityGeneratorNoBatchStrategy
+    EntityGeneratorWithoutBatchStrategy $entityGeneratorNoBatchStrategy,
+    AccountProxyInterface $currentUser
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->bundleInfo = $bundleInfo;
     $this->entityGeneratorBatchStrategy = $entityGeneratorBatchStrategy;
     $this->entityGeneratorNoBatchStrategy = $entityGeneratorNoBatchStrategy;
+    $this->currentUser = $currentUser;
   }
   
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
@@ -63,6 +66,7 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
       $container->get('entity_type.bundle.info'),
       $container->get('tengstrom_demo_entity_generator_batch_strategy'),
       $container->get('tengstrom_demo_entity_generator_nobatch_strategy'),
+      $container->get('current_user')
     );
   }
 
@@ -100,7 +104,8 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
       'Demo Content #@num',
       $bundleNames,
       $num,
-      $deleteExisting
+      $deleteExisting,
+      (int) $this->currentUser->id()
     );
 
     $strategy = $this->getStrategy($num);
@@ -120,9 +125,9 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
   }
 
   protected function getStrategy(int $num): EntityGeneratorStrategyInterface {
-    // if($num > $this->getSetting('batch_minimum_limit')) {
-    //   return $this->entityGeneratorBatchStrategy;
-    // }
+    if($num > $this->getSetting('batch_minimum_limit')) {
+      return $this->entityGeneratorBatchStrategy;
+    }
 
     return $this->entityGeneratorNoBatchStrategy;
   }
