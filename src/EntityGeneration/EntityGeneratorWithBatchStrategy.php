@@ -4,12 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\tengstrom_demo\EntityGeneration;
 
+use Drupal\Core\Messenger\MessengerInterface;
+
 class EntityGeneratorWithBatchStrategy implements EntityGeneratorStrategyInterface {
 
+  protected bool $drushBatch;
+
+  protected MessengerInterface $messenger;
   protected EntityGenerator $entityGenerator;
   protected EntityDeleter $entityDeleter;
 
-  public function __construct(EntityGenerator $entityGenerator, EntityDeleter $entityDeleter) {
+  public function __construct(
+    MessengerInterface $messenger,
+    EntityGenerator $entityGenerator,
+    EntityDeleter $entityDeleter,
+  ) {
+    $this->messenger = $messenger;
     $this->entityGenerator = $entityGenerator;
     $this->entityDeleter = $entityDeleter;
   }
@@ -53,5 +63,15 @@ class EntityGeneratorWithBatchStrategy implements EntityGeneratorStrategyInterfa
   }
 
   public function deleteExistingEntities(string $entityTypeId): void {}
+
+  /**
+   * Batch wrapper for calling ContentPreNode.
+   */
+  public function batchContentPreNode($vars, &$context) {
+    $context['results'] = $vars;
+    $context['results']['num'] = 0;
+    $context['results']['num_translations'] = 0;
+    $this->develGenerateContentPreNode($context['results']);
+  }
 
 }

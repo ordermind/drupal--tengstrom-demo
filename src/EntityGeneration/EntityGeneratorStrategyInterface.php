@@ -8,6 +8,4 @@ interface EntityGeneratorStrategyInterface {
 
   public function generateEntities(EntityGenerationOptions $options): void;
 
-  public function deleteExistingEntities(string $entityTypeId): void;
-
 }

@@ -9,6 +9,7 @@ class EntityGenerationOptions {
   protected string $labelPattern;
   protected array $bundleNames;
   protected int $numberOfEntities;
+  protected bool $deleteEntitiesBeforeCreation;
   protected array $baseData;
   protected ?int $authorUid;
 
@@ -26,6 +27,7 @@ class EntityGenerationOptions {
     string $labelPattern,
     array $bundleNames,
     int $numberOfEntities,
+    bool $deleteEntitiesBeforeCreation,
     array $baseData = [],
     int $authorUid = NULL
   ) {
@@ -33,6 +35,7 @@ class EntityGenerationOptions {
     $this->labelPattern = $labelPattern;
     $this->bundleNames = $bundleNames;
     $this->numberOfEntities = $numberOfEntities;
+    $this->deleteEntitiesBeforeCreation = $deleteEntitiesBeforeCreation;
     $this->baseData = $baseData;
     $this->authorUid = $authorUid;
   }
@@ -51,6 +54,10 @@ class EntityGenerationOptions {
 
   public function getNumberOfEntities(): int {
     return $this->numberOfEntities;
+  }
+
+  public function isDeleteEntitiesBeforeCreation(): bool {
+    return $this->deleteEntitiesBeforeCreation;
   }
 
   public function getBaseData(): array {

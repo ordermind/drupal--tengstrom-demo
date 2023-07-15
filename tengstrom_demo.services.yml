@@ -13,11 +13,13 @@ services:
   tengstrom_demo_entity_generator_batch_strategy:
     class: Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithBatchStrategy
     arguments:
+      - '@messenger'
       - '@tengstrom_demo_entity_generator'
       - '@tengstrom_demo_entity_deleter'
 
   tengstrom_demo_entity_generator_nobatch_strategy:
     class: Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithoutBatchStrategy
     arguments:
+      - '@messenger'
       - '@tengstrom_demo_entity_generator'
       - '@tengstrom_demo_entity_deleter'

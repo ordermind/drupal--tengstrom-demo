@@ -92,14 +92,20 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
   protected function generateElements(array $values): void {
     $num = (int) $values['num'];
     $deleteExisting = (bool) $values['delete_existing'];
+    $bundles = $this->bundleInfo->getBundleInfo(static::ENTITY_TYPE);
+    $bundleNames = array_keys($bundles);
+    
+    $generationOptions = new EntityGenerationOptions(
+      static::ENTITY_TYPE,
+      'Demo Content #@num',
+      $bundleNames,
+      $num,
+      $deleteExisting
+    );
 
     $strategy = $this->getStrategy($num);
 
-    if($deleteExisting) {
-      $this->deleteAllExistingEntities($strategy);
-    }
-
-    $this->createEntities($strategy, $num);
+    $strategy->generateEntities($generationOptions);
   }
     
   /**
@@ -111,30 +117,6 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
       'deleteExisting' => $options['deleteExisting'],
     ];
     return $values;
-  }
-
-  protected function deleteAllExistingEntities(EntityGeneratorStrategyInterface $strategy): void {
-    $strategy->deleteExistingEntities(static::ENTITY_TYPE);
-
-    $this->setMessage($this->t('Old entities have been deleted.'));
-  }
-
-  protected function createEntities(EntityGeneratorStrategyInterface $strategy, int $num): void {
-    $bundles = $this->bundleInfo->getBundleInfo(static::ENTITY_TYPE);
-    $bundleNames = array_keys($bundles);
-    
-    $generationOptions = new EntityGenerationOptions(
-      static::ENTITY_TYPE,
-      'Demo Content #@num',
-      $bundleNames,
-      $num
-    );
-
-    $strategy->generateEntities($generationOptions);
-
-    $this->setMessage($this->t('@num_entities created.', [
-      '@num_entities' => $this->formatPlural($generationOptions->getNumberOfEntities(), '1 entity', '@count entities'),
-    ]));
   }
 
   protected function getStrategy(int $num): EntityGeneratorStrategyInterface {
