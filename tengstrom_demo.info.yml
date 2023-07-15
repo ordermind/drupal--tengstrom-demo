@@ -9,5 +9,6 @@ dependencies:
   - actionlink_dropdown:actionlink_dropdown
   - drupal:views
   - confi:config_import
+  - devel_generate:devel_generate
 
 version: 0.1.0

@@ -13,7 +13,8 @@
         "drupal/tengstrom_general": "dev-master",
         "drupal/accordion_table": "dev-master",
         "drupal/actionlink_dropdown": "dev-master",
-        "drupal/confi": "^3.0"
+        "drupal/confi": "^3.0",
+        "drupal/devel": "^5.1"
     }
 }
 
