@@ -73,7 +73,6 @@ use Drupal\user\EntityOwnerTrait;
  * )
  */
 class TengstromDemoContent extends RevisionableContentEntityBase implements TengstromDemoContentInterface {
-
   use EntityChangedTrait;
   use EntityOwnerTrait;
 
