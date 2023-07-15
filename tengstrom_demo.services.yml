@@ -1,0 +1,23 @@
+services:
+  tengstrom_demo_entity_generator:
+    class: Drupal\tengstrom_demo\EntityGeneration\EntityGenerator
+    arguments:
+      - '@entity_type.manager'
+      - '@current_user'
+
+  tengstrom_demo_entity_deleter:
+    class: Drupal\tengstrom_demo\EntityGeneration\EntityDeleter
+    arguments:
+      - '@entity_type.manager'
+
+  tengstrom_demo_entity_generator_batch_strategy:
+    class: Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithBatchStrategy
+    arguments:
+      - '@tengstrom_demo_entity_generator'
+      - '@tengstrom_demo_entity_deleter'
+
+  tengstrom_demo_entity_generator_nobatch_strategy:
+    class: Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithoutBatchStrategy
+    arguments:
+      - '@tengstrom_demo_entity_generator'
+      - '@tengstrom_demo_entity_deleter'

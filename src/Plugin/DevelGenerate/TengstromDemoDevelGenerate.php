@@ -10,6 +10,10 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\devel_generate\DevelGenerateBase;
 use Drupal\tengstrom_demo\Entity\TengstromDemoContent;
+use Drupal\tengstrom_demo\EntityGeneration\EntityGenerationOptions;
+use Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorStrategyInterface;
+use Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithBatchStrategy;
+use Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithoutBatchStrategy;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,8 +27,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   url = "devel_generate_tengstrom_demo",
  *   permission = "administer devel_generate",
  *   settings = {
- *     "num" = 50,
- *     "kill" = FALSE
+ *     "num" = 100,
+ *     "delete_existing" = TRUE,
+ *     "batch_minimum_limit" = 50
  *   }
  * )
  */
@@ -32,19 +37,22 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
   protected const ENTITY_TYPE = 'tengstrom_demo_content';
 
   protected EntityTypeBundleInfoInterface $bundleInfo;
-  protected AccountProxyInterface $currentUser;
+  protected EntityGeneratorWithBatchStrategy $entityGeneratorBatchStrategy;
+  protected EntityGeneratorWithoutBatchStrategy $entityGeneratorNoBatchStrategy;
 
   public function __construct(
     array $configuration, 
     string $plugin_id, 
     array $plugin_definition, 
     EntityTypeBundleInfoInterface $bundleInfo,
-    AccountProxyInterface $currentUser
+    EntityGeneratorWithBatchStrategy $entityGeneratorBatchStrategy,
+    EntityGeneratorWithoutBatchStrategy $entityGeneratorNoBatchStrategy
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->bundleInfo = $bundleInfo;
-    $this->currentUser = $currentUser;
+    $this->entityGeneratorBatchStrategy = $entityGeneratorBatchStrategy;
+    $this->entityGeneratorNoBatchStrategy = $entityGeneratorNoBatchStrategy;
   }
   
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
@@ -53,7 +61,8 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.bundle.info'),
-      $container->get('current_user')
+      $container->get('tengstrom_demo_entity_generator_batch_strategy'),
+      $container->get('tengstrom_demo_entity_generator_nobatch_strategy'),
     );
   }
 
@@ -68,10 +77,10 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
       '#size' => 10,
     ];
 
-    $form['kill'] = [
+    $form['delete_existing'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Delete all entities before generating new ones.'),
-      '#default_value' => $this->getSetting('kill'),
+      '#default_value' => $this->getSetting('delete_existing'),
     ];
 
     return $form;
@@ -82,13 +91,15 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
    */
   protected function generateElements(array $values): void {
     $num = (int) $values['num'];
-    $kill = (bool) $values['kill'];
+    $deleteExisting = (bool) $values['delete_existing'];
 
-    if ($kill) {
-      $this->deleteAllExistingEntities();
+    $strategy = $this->getStrategy($num);
+
+    if($deleteExisting) {
+      $this->deleteAllExistingEntities($strategy);
     }
 
-    $this->createEntities($num);
+    $this->createEntities($strategy, $num);
   }
     
   /**
@@ -97,73 +108,40 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
   public function validateDrushParams(array $args, array $options = []): array {
     $values = [
       'num' => $options['num'],
-      'kill' => $options['kill'],
+      'deleteExisting' => $options['deleteExisting'],
     ];
     return $values;
   }
 
-  protected function deleteAllExistingEntities(): void {
-    $chunkSize = 100;
-    $skip = 0;
-
-    $entityQuery = \Drupal::entityQuery(static::ENTITY_TYPE)
-      ->accessCheck(FALSE);
-
-    while(
-      $contentIds = $entityQuery
-        ->range($skip, $chunkSize)
-        ->execute()
-    ) {
-      foreach($contentIds as $contentId) {
-        $content = TengstromDemoContent::load($contentId);
-        if(!$content) {
-          continue;
-        }
-
-        $content->delete();
-      }
-
-      $skip += $chunkSize;
-
-      usleep(5000);
-    }
+  protected function deleteAllExistingEntities(EntityGeneratorStrategyInterface $strategy): void {
+    $strategy->deleteExistingEntities(static::ENTITY_TYPE);
 
     $this->setMessage($this->t('Old entities have been deleted.'));
   }
 
-  protected function createEntities(int $num): void {
-    if($num < 0) {
-      throw new InvalidArgumentException('The "num" parameter must be a positive integer');
-    }
-
-    $storage = $this->getEntityTypeManager()->getStorage(static::ENTITY_TYPE);
-    $bundles = $this->bundleInfo->getBundleInfo('tengstrom_demo_content');
+  protected function createEntities(EntityGeneratorStrategyInterface $strategy, int $num): void {
+    $bundles = $this->bundleInfo->getBundleInfo(static::ENTITY_TYPE);
     $bundleNames = array_keys($bundles);
+    
+    $generationOptions = new EntityGenerationOptions(
+      static::ENTITY_TYPE,
+      'Demo Content #@num',
+      $bundleNames,
+      $num
+    );
 
-    $uid = $this->currentUser->id();
-
-    $chunkSize = 100;
-
-    for($i = 0, $imax = $num; $i < $imax; $i++) {
-      $baseData = [
-        'bundle' => $bundleNames[rand(0, 1)],
-        'uid'     => $uid,
-        'label'    => 'Demo Content #' . $i + 1,
-        'status'  => 1,
-        'created' => \Drupal::time()->getRequestTime(),
-      ];
-
-      $entity = $storage->create($baseData);
-      $this->populateFields($entity);
-      $entity->save();
-
-      if($i % $chunkSize === 0) {
-        usleep(5000);
-      }
-    }
+    $strategy->generateEntities($generationOptions);
 
     $this->setMessage($this->t('@num_entities created.', [
-      '@num_entities' => $this->formatPlural($num, '1 entity', '@count entities'),
+      '@num_entities' => $this->formatPlural($generationOptions->getNumberOfEntities(), '1 entity', '@count entities'),
     ]));
+  }
+
+  protected function getStrategy(int $num): EntityGeneratorStrategyInterface {
+    // if($num > $this->getSetting('batch_minimum_limit')) {
+    //   return $this->entityGeneratorBatchStrategy;
+    // }
+
+    return $this->entityGeneratorNoBatchStrategy;
   }
 }
