@@ -7,6 +7,7 @@ namespace Drupal\tengstrom_demo\Plugin\DevelGenerate;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\devel_generate\DevelGenerateBase;
 use Drupal\tengstrom_demo\Entity\TengstromDemoContent;
 use InvalidArgumentException;
@@ -31,16 +32,19 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
   protected const ENTITY_TYPE = 'tengstrom_demo_content';
 
   protected EntityTypeBundleInfoInterface $bundleInfo;
+  protected AccountProxyInterface $currentUser;
 
   public function __construct(
     array $configuration, 
     string $plugin_id, 
     array $plugin_definition, 
-    EntityTypeBundleInfoInterface $bundleInfo
+    EntityTypeBundleInfoInterface $bundleInfo,
+    AccountProxyInterface $currentUser
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->bundleInfo = $bundleInfo;
+    $this->currentUser = $currentUser;
   }
   
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
@@ -48,7 +52,8 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.bundle.info')
+      $container->get('entity_type.bundle.info'),
+      $container->get('current_user')
     );
   }
 
@@ -135,16 +140,17 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
     $bundles = $this->bundleInfo->getBundleInfo('tengstrom_demo_content');
     $bundleNames = array_keys($bundles);
 
+    $uid = $this->currentUser->id();
+
     $chunkSize = 100;
 
     for($i = 0, $imax = $num; $i < $imax; $i++) {
       $baseData = [
         'bundle' => $bundleNames[rand(0, 1)],
-        'uid'     => NULL,
+        'uid'     => $uid,
         'label'    => 'Demo Content #' . $i + 1,
         'status'  => 1,
         'created' => \Drupal::time()->getRequestTime(),
-        'devel_generate' => TRUE,
       ];
 
       $entity = $storage->create($baseData);
