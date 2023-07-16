@@ -5,26 +5,21 @@ declare(strict_types=1);
 namespace Drupal\tengstrom_demo\Plugin\DevelGenerate;
 
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\devel_generate\DevelGenerateBase;
-use Drupal\tengstrom_demo\Entity\TengstromDemoContent;
-use Drupal\tengstrom_demo\EntityGeneration\EntityGenerationOptions;
-use Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorStrategyInterface;
-use Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithBatchStrategy;
-use Drupal\tengstrom_demo\EntityGeneration\EntityGeneratorWithoutBatchStrategy;
-use InvalidArgumentException;
+use Drupal\devel_generate_custom_entities\Concerns\DevelGeneratePluginTrait;
+use Drupal\devel_generate_custom_entities\Factory\EntityGeneratorStrategyFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a DevelGenerate plugin.
  *
  * @DevelGenerate(
- *   id = "devel_generate_tengstrom_demo",
+ *   id = "tengstrom_demo_devel_generate",
  *   label = "Tengstrom Demo Content",
  *   description = "Generate a given number of tengstrom demo content.",
- *   url = "devel_generate_tengstrom_demo",
+ *   url = "tengstrom_demo_devel_generate",
  *   permission = "administer devel_generate",
  *   settings = {
  *     "num" = 100,
@@ -34,11 +29,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerFactoryPluginInterface {
-  protected const ENTITY_TYPE = 'tengstrom_demo_content';
+  use DevelGeneratePluginTrait;
 
   protected EntityTypeBundleInfoInterface $bundleInfo;
-  protected EntityGeneratorWithBatchStrategy $entityGeneratorBatchStrategy;
-  protected EntityGeneratorWithoutBatchStrategy $entityGeneratorNoBatchStrategy;
+  protected EntityGeneratorStrategyFactory $strategyFactory;
   protected AccountProxyInterface $currentUser;
 
   public function __construct(
@@ -46,16 +40,51 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
     string $plugin_id, 
     array $plugin_definition, 
     EntityTypeBundleInfoInterface $bundleInfo,
-    EntityGeneratorWithBatchStrategy $entityGeneratorBatchStrategy,
-    EntityGeneratorWithoutBatchStrategy $entityGeneratorNoBatchStrategy,
+    EntityGeneratorStrategyFactory $strategyFactory,
     AccountProxyInterface $currentUser
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->bundleInfo = $bundleInfo;
-    $this->entityGeneratorBatchStrategy = $entityGeneratorBatchStrategy;
-    $this->entityGeneratorNoBatchStrategy = $entityGeneratorNoBatchStrategy;
+    $this->strategyFactory = $strategyFactory;
     $this->currentUser = $currentUser;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  protected function getEntityTypeId(): string {
+    return 'tengstrom_demo_content';
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  protected function getBundleNames(): array {
+    $bundles = $this->bundleInfo->getBundleInfo($this->getEntityTypeId());
+    
+    return array_keys($bundles);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  protected function getLabelPattern(): string {
+    return 'Demo Content #@num';
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  protected function getCurrentUser(): AccountProxyInterface {
+    return $this->currentUser;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  protected function getStrategyFactory(): EntityGeneratorStrategyFactory {
+    return $this->strategyFactory;
   }
   
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
@@ -64,71 +93,8 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.bundle.info'),
-      $container->get('tengstrom_demo_entity_generator_batch_strategy'),
-      $container->get('tengstrom_demo_entity_generator_nobatch_strategy'),
+      $container->get('devel_generate_custom_entities.strategy_factory'),
       $container->get('current_user')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, FormStateInterface $form_state): array {
-    $form['num'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('How many entities would you like to generate?'),
-      '#default_value' => $this->getSetting('num'),
-      '#size' => 10,
-    ];
-
-    $form['delete_existing'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Delete all entities before generating new ones.'),
-      '#default_value' => $this->getSetting('delete_existing'),
-    ];
-
-    return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function generateElements(array $values): void {
-    $num = (int) $values['num'];
-    $deleteExisting = (bool) $values['delete_existing'];
-    $bundles = $this->bundleInfo->getBundleInfo(static::ENTITY_TYPE);
-    $bundleNames = array_keys($bundles);
-    
-    $generationOptions = new EntityGenerationOptions(
-      static::ENTITY_TYPE,
-      'Demo Content #@num',
-      $bundleNames,
-      $num,
-      $deleteExisting,
-      (int) $this->currentUser->id()
-    );
-
-    $strategy = $this->getStrategy($num);
-
-    $strategy->generateEntities($generationOptions);
-  }
-    
-  /**
-   * {@inheritdoc}
-   */
-  public function validateDrushParams(array $args, array $options = []): array {
-    $values = [
-      'num' => $options['num'],
-      'deleteExisting' => $options['deleteExisting'],
-    ];
-    return $values;
-  }
-
-  protected function getStrategy(int $num): EntityGeneratorStrategyInterface {
-    if($num > $this->getSetting('batch_minimum_limit')) {
-      return $this->entityGeneratorBatchStrategy;
-    }
-
-    return $this->entityGeneratorNoBatchStrategy;
   }
 }
