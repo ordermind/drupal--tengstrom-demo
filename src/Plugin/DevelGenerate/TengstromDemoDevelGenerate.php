@@ -7,9 +7,10 @@ namespace Drupal\tengstrom_demo\Plugin\DevelGenerate;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\devel_generate\DevelGenerateBase;
-use Drupal\devel_generate_custom_entities\Concerns\DevelGeneratePluginTrait;
 use Drupal\devel_generate_custom_entities\Factory\EntityGeneratorStrategyFactory;
+use Drupal\devel_generate_custom_entities\Plugin\DevelGenerate\AbstractDevelGeneratePlugin;
+use Drupal\devel_generate_custom_entities\Strategy\EntityGeneratorWithBatchStrategy;
+use Drupal\devel_generate_custom_entities\Strategy\EntityGeneratorWithoutBatchStrategy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,9 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerFactoryPluginInterface {
-  use DevelGeneratePluginTrait;
-
+class TengstromDemoDevelGenerate extends AbstractDevelGeneratePlugin implements ContainerFactoryPluginInterface {
   protected EntityTypeBundleInfoInterface $bundleInfo;
   protected EntityGeneratorStrategyFactory $strategyFactory;
   protected AccountProxyInterface $currentUser;
@@ -38,16 +37,34 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
   public function __construct(
     array $configuration, 
     string $plugin_id, 
-    array $plugin_definition, 
-    EntityTypeBundleInfoInterface $bundleInfo,
-    EntityGeneratorStrategyFactory $strategyFactory,
-    AccountProxyInterface $currentUser
+    array $plugin_definition,
+    EntityGeneratorWithBatchStrategy $withBatchStrategy,
+    EntityGeneratorWithoutBatchStrategy $withoutBatchStrategy,
+    AccountProxyInterface $currentUser,
+    EntityTypeBundleInfoInterface $bundleInfo
   ) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    parent::__construct(
+      $configuration, 
+      $plugin_id, 
+      $plugin_definition,
+      $withBatchStrategy,
+      $withoutBatchStrategy,
+      $currentUser
+    );
 
     $this->bundleInfo = $bundleInfo;
-    $this->strategyFactory = $strategyFactory;
-    $this->currentUser = $currentUser;
+  }
+
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('devel_generate_custom_entities.strategy_with_batch'),
+      $container->get('devel_generate_custom_entities.strategy_without_batch'),
+      $container->get('current_user'),
+      $container->get('entity_type.bundle.info')
+    );
   }
 
   /**
@@ -71,30 +88,5 @@ class TengstromDemoDevelGenerate extends DevelGenerateBase implements ContainerF
    */
   protected function getLabelPattern(): string {
     return 'Demo Content #@num';
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  protected function getCurrentUser(): AccountProxyInterface {
-    return $this->currentUser;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  protected function getStrategyFactory(): EntityGeneratorStrategyFactory {
-    return $this->strategyFactory;
-  }
-  
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.bundle.info'),
-      $container->get('devel_generate_custom_entities.strategy_factory'),
-      $container->get('current_user')
-    );
   }
 }
