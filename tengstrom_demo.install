@@ -47,10 +47,15 @@ function _tengstrom_demo_enable_split_config() {
 function _tengstrom_demo_generate_entities() {
   /** @var \Drupal\devel_generate\DevelGeneratePluginManager $manager */
   $manager = \Drupal::service('plugin.manager.develgenerate');
-  /** @var \Drupal\tengstrom_demo\Plugin\DevelGenerate\TengstromDemoDevelGenerate $instance */
-  $instance = $manager->createInstance('tengstrom_demo_content');
 
-  $parameters = ['num' => 100, 'delete_existing' => FALSE];
+  /** @var \Drupal\tengstrom_demo\Plugin\DevelGenerate\TengstromDemoDevelGenerate $instance */
+  $instance = $manager->createInstance('default_custom_entity');
+
+  $parameters = [
+    'entity_type' => 'tengstrom_demo_content',
+    'num' => 100,
+    'delete_existing' => FALSE,
+  ];
   if (PHP_SAPI === 'cli') {
     $parameters['drush'] = TRUE;
   }
