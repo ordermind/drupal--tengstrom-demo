@@ -16,11 +16,6 @@
             "type": "vcs",
             "url": "git@github.com:ordermind/drupal--devel-generate-custom-entities.git",
             "no-api": true
-        },
-        {
-            "type": "vcs",
-            "url": "git@github.com:ordermind/drupal--tengstrom-general.git",
-            "no-api": true
         }
     ],
     "require": {
