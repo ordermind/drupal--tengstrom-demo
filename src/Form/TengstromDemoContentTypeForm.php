@@ -38,7 +38,10 @@ class TengstromDemoContentTypeForm extends BundleEntityFormBase {
       '#default_value' => $entity_type->id(),
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
       '#machine_name' => [
-        'exists' => ['Drupal\tengstrom_demo\Entity\TengstromDemoContentType', 'load'],
+        'exists' => [
+          'Drupal\tengstrom_demo\Entity\TengstromDemoContentType',
+          'load',
+        ],
         'source' => ['label'],
       ],
       '#description' => $this->t('A unique machine-readable name for this demo content type. It must only contain lowercase letters, numbers, and underscores.'),
