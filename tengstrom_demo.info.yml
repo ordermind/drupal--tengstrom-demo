@@ -8,6 +8,7 @@ dependencies:
   - accordion_table:accordion_table
   - actionlink_dropdown:actionlink_dropdown
   - drupal:views
+  - config_split:config_split
   - confi:config_import
   - devel_generate_custom_entities:devel_generate_custom_entities
 

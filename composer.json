@@ -23,6 +23,7 @@
         "drupal/accordion_table": "dev-master",
         "drupal/actionlink_dropdown": "dev-master",
         "drupal/confi": "^3.0",
+        "drupal/config_split": "^2.0-rc3",
         "drupal/devel_generate_custom_entities": "dev-master"
     }
 }
