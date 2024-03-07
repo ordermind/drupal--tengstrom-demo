@@ -1,0 +1,1 @@
+If a bundle is missing during the seeding of demo content, make sure that the config files are present in the config/sync folder.
