@@ -2,7 +2,7 @@ name: Tengström Demo
 type: module
 package: Tengström Profile
 description: 'Provides demo content for the Tengström profile'
-core_version_requirement: '^9 || ^10'
+core_version_requirement: '^10 || ^11'
 
 dependencies:
   - accordion_table:accordion_table
