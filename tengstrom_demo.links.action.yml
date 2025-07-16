@@ -12,8 +12,8 @@ tengstrom_demo_content.add_page:
 
 tengstrom_demo_content.single_custom_link:
   route_name: tengstrom_demo.demo_content
-  # Using the MenuLinkAdd class adds a destination query string that redirects to the current page.
-  class: \Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd
+  # Using the LocalActionWithDestination class adds a destination query string that redirects to the current page.
+  class: \Drupal\Core\Menu\LocalActionWithDestination
   title: 'Add demo content'
   appears_on:
     - tengstrom_demo.demo_content
@@ -31,8 +31,8 @@ tengstrom_demo_content.single_custom_link:
 
 tengstrom_demo_content.multiple_custom_links:
   route_name: tengstrom_demo.demo_content
-  # Using the MenuLinkAdd class adds a destination query string that redirects to the current page.
-  class: \Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd
+  # Using the LocalActionWithDestination class adds a destination query string that redirects to the current page.
+  class: \Drupal\Core\Menu\LocalActionWithDestination
   title: 'Add demo content'
   appears_on:
     - tengstrom_demo.demo_content
@@ -55,8 +55,8 @@ tengstrom_demo_content.multiple_custom_links:
 
 tengstrom_demo_content.multiple_entity_add_links:
   route_name: tengstrom_demo.demo_content
-  # Using the MenuLinkAdd class adds a destination query string that redirects to the current page.
-  class: \Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd
+  # Using the LocalActionWithDestination class adds a destination query string that redirects to the current page.
+  class: \Drupal\Core\Menu\LocalActionWithDestination
   title: 'Add demo content'
   appears_on:
     - tengstrom_demo.demo_content
